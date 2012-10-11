@@ -42,7 +42,7 @@ public class CustomViewAbove extends ViewGroup {
 
 	private static final boolean USE_CACHE = false;
 
-	private static final int MAX_SETTLE_DURATION = 600; // ms
+	private static final int MAX_SETTLE_DURATION = 400; // ms
 	private static final int MIN_DISTANCE_FOR_FLING = 25; // dips
 
 	private static final Interpolator sInterpolator = new Interpolator() {
@@ -94,7 +94,7 @@ public class CustomViewAbove extends ViewGroup {
 	private int mFlingDistance;
 
 	private boolean mLastTouchAllowed = false;
-	private final int mSlidingMenuThreshold = 16;
+	private int mSlidingMenuThreshold; //set with getScaledEdgeSlop()	
 	private CustomViewBehind mCustomViewBehind;
 	private boolean mEnabled = true;
 
@@ -179,8 +179,9 @@ public class CustomViewAbove extends ViewGroup {
 		setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
 		setFocusable(true);
 		final Context context = getContext();
-		mScroller = new Scroller(context, sInterpolator);
 		final ViewConfiguration configuration = ViewConfiguration.get(context);
+		mSlidingMenuThreshold = configuration.getScaledEdgeSlop();
+		mScroller = new Scroller(context, sInterpolator);
 		mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
 		mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
 		mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
