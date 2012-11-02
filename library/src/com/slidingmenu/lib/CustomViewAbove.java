@@ -94,7 +94,7 @@ public class CustomViewAbove extends ViewGroup {
 	private int mFlingDistance;
 
 	private boolean mLastTouchAllowed = false;
-	private int mSlidingMenuThreshold; //set with getScaledEdgeSlop()	
+	private int mSlidingMenuThreshold = 0; //Disable swipping 
 	private CustomViewBehind mCustomViewBehind;
 	private boolean mEnabled = true;
 
@@ -214,7 +214,6 @@ public class CustomViewAbove extends ViewGroup {
 		setFocusable(true);
 		final Context context = getContext();
 		final ViewConfiguration configuration = ViewConfiguration.get(context);
-		mSlidingMenuThreshold = configuration.getScaledEdgeSlop();
 		mScroller = new Scroller(context, sInterpolator);
 		mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
 		mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
