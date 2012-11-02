@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -17,6 +18,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
@@ -27,6 +29,7 @@ public class SlidingMenu extends RelativeLayout {
 
 	public static final int TOUCHMODE_MARGIN = 0;
 	public static final int TOUCHMODE_FULLSCREEN = 1;
+	public static final int TOUCHMODE_NONE = 2;
 
 	private CustomViewAbove mViewAbove;
 	private CustomViewBehind mViewBehind;
@@ -45,6 +48,7 @@ public class SlidingMenu extends RelativeLayout {
 			// get the window background
 			TypedArray a = activity.getTheme().obtainStyledAttributes(new int[] {android.R.attr.windowBackground});
 			int background = a.getResourceId(0, 0);
+			a.recycle();
 			// move everything into the SlidingMenu
 			ViewGroup decor = (ViewGroup) activity.getWindow().getDecorView();
 			ViewGroup decorChild = (ViewGroup) decor.getChildAt(0);
@@ -161,6 +165,7 @@ public class SlidingMenu extends RelativeLayout {
 		int selectorRes = ta.getResourceId(R.styleable.SlidingMenu_selectorDrawable, -1);
 		if (selectorRes != -1)
 			setSelectorDrawable(selectorRes);
+		ta.recycle();
 	}
 
 	public void setContent(int res) {
@@ -213,14 +218,31 @@ public class SlidingMenu extends RelativeLayout {
 	 * Shows the behind view
 	 */
 	public void showBehind() {
-		mViewAbove.setCurrentItem(0);
+		showBehind(true);
+	}
+	public void showBehind(boolean animate) {
+		mViewAbove.setCurrentItem(0, animate);
 	}
 
 	/**
 	 * Shows the above view
 	 */
 	public void showAbove() {
-		mViewAbove.setCurrentItem(1);
+		showAbove(true);
+	}
+	public void showAbove(boolean animate) {
+		mViewAbove.setCurrentItem(1, animate);
+	}
+	
+	public void toggle() {
+		toggle(true);
+	}
+	public void toggle(boolean animate) {
+		if (isBehindShowing()) {
+			showAbove(animate);
+		} else {
+			showBehind(animate);
+		}
 	}
 
 	/**
@@ -249,6 +271,14 @@ public class SlidingMenu extends RelativeLayout {
 		int top = params.topMargin;
 		int left = params.leftMargin;
 		params.setMargins(left, top, i, bottom);
+		OnGlobalLayoutListener layoutListener = new OnGlobalLayoutListener() {
+			public void onGlobalLayout() {
+				showAbove();
+				mViewAbove.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+			}
+		};
+		mViewAbove.getViewTreeObserver().addOnGlobalLayoutListener(layoutListener);
+		mViewAbove.requestLayout();
 	}
 	
 	
@@ -333,9 +363,10 @@ public class SlidingMenu extends RelativeLayout {
 	}
 
 	public void setTouchModeAbove(int i) {
-		if (i != TOUCHMODE_FULLSCREEN && i != TOUCHMODE_MARGIN) {
+		if (i != TOUCHMODE_FULLSCREEN && i != TOUCHMODE_MARGIN
+				&& i != TOUCHMODE_NONE) {
 			throw new IllegalStateException("TouchMode must be set to either" +
-					"TOUCHMODE_FULLSCREEN or TOUCHMODE_MARGIN.");
+					"TOUCHMODE_FULLSCREEN or TOUCHMODE_MARGIN or TOUCHMODE_NONE.");
 		}
 		mViewAbove.setTouchMode(i);
 	}
@@ -345,15 +376,20 @@ public class SlidingMenu extends RelativeLayout {
 	}
 
 	public void setTouchModeBehind(int i) {
-		if (i != TOUCHMODE_FULLSCREEN && i != TOUCHMODE_MARGIN) {
+		if (i != TOUCHMODE_FULLSCREEN && i != TOUCHMODE_MARGIN
+				&& i != TOUCHMODE_NONE) {
 			throw new IllegalStateException("TouchMode must be set to either" +
-					"TOUCHMODE_FULLSCREEN or TOUCHMODE_MARGIN.");
+					"TOUCHMODE_FULLSCREEN or TOUCHMODE_MARGIN or TOUCHMODE_NONE.");
 		}
 		mViewBehind.setTouchMode(i);
 	}
 
 	public void setShadowDrawable(int resId) {
 		mViewAbove.setShadowDrawable(resId);
+	}
+	
+	public void setShadowDrawable(Drawable d) {
+		mViewAbove.setShadowDrawable(d);
 	}
 
 	public void setShadowWidthRes(int resId) {

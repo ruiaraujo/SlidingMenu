@@ -156,35 +156,34 @@ public class CustomViewAbove extends ViewGroup {
 		}
 
 	}
-	
+
 	private class Window extends FrameLayout {
 
 		public Window(Context context) {
 			super(context);
 		}
-		
+
 		public boolean onTouchEvent(MotionEvent event) {
 			return false;
 		}
-		
+
 		public boolean onInterceptTouchEvent(MotionEvent event) {
 			return false;
 		}
-		
+
 	}
-	
+
 	public class Content extends FrameLayout {
 		public Content(Context context) {
 			super(context);
 		}
-		
+
 		public boolean onTouchEvent(MotionEvent event) {
 			return super.onTouchEvent(event);
 		}
-		
+
 		public boolean onInterceptTouchEvent(MotionEvent event) {
 			if (event.getX() < getPaddingLeft()) {
-				Log.v(TAG, "ignoring touch");
 				return false;
 			}
 			return super.onInterceptTouchEvent(event);
@@ -374,8 +373,8 @@ public class CustomViewAbove extends ViewGroup {
 	 */
 	public void setShadowDrawable(Drawable d) {
 		mShadowDrawable = d;
-		if (d != null) refreshDrawableState();
-		setWillNotDraw(d == null);
+		refreshDrawableState();
+		setWillNotDraw(false);
 		invalidate();
 	}
 
@@ -709,6 +708,8 @@ public class CustomViewAbove extends ViewGroup {
 			switch (mTouchModeBehind) {
 			case SlidingMenu.TOUCHMODE_FULLSCREEN:
 				return true;
+			case SlidingMenu.TOUCHMODE_NONE:
+				return false;
 			case SlidingMenu.TOUCHMODE_MARGIN:
 				return x >= getContentLeft();
 			default:
@@ -718,6 +719,8 @@ public class CustomViewAbove extends ViewGroup {
 			switch (mTouchMode) {
 			case SlidingMenu.TOUCHMODE_FULLSCREEN:
 				return true;
+			case SlidingMenu.TOUCHMODE_NONE:
+				return false;
 			case SlidingMenu.TOUCHMODE_MARGIN:
 				int pixels = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 
 						mSlidingMenuThreshold, getResources().getDisplayMetrics());
@@ -727,6 +730,18 @@ public class CustomViewAbove extends ViewGroup {
 				return false;
 			}
 		}
+	}
+
+	private boolean thisSlideAllowed(float dx) {
+		boolean allowed = false;
+		if (isMenuOpen()) {
+			allowed = dx < 0;
+		} else if (mCustomViewBehind != null) {
+			allowed = dx > 0;
+		}
+		if (DEBUG)
+			Log.v(TAG, "this slide allowed " + allowed);
+		return allowed;
 	}
 
 	private boolean mIsUnableToDrag;
@@ -740,7 +755,7 @@ public class CustomViewAbove extends ViewGroup {
 
 		final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
 
-		if (action == MotionEvent.ACTION_DOWN)
+		if (action == MotionEvent.ACTION_DOWN && DEBUG)
 			Log.v(TAG, "Received ACTION_DOWN");
 
 		if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
@@ -768,12 +783,16 @@ public class CustomViewAbove extends ViewGroup {
 				break;
 
 			final int pointerIndex = MotionEventCompat.findPointerIndex(ev, activePointerId);
+			if (pointerIndex == -1) {
+				mActivePointerId = INVALID_POINTER;
+				break;
+			}
 			final float x = MotionEventCompat.getX(ev, pointerIndex);
 			final float dx = x - mLastMotionX;
 			final float xDiff = Math.abs(dx);
 			final float y = MotionEventCompat.getY(ev, pointerIndex);
 			final float yDiff = Math.abs(y - mLastMotionY);
-			if (xDiff > mTouchSlop && xDiff > yDiff) {
+			if (xDiff > mTouchSlop && xDiff > yDiff && thisSlideAllowed(dx)) {
 				if (DEBUG) Log.v(TAG, "Starting drag! from onInterceptTouch");
 				mIsBeingDragged = true;
 				mLastMotionX = x;
@@ -786,7 +805,6 @@ public class CustomViewAbove extends ViewGroup {
 		case MotionEvent.ACTION_DOWN:
 			mActivePointerId = ev.getAction() & ((Build.VERSION.SDK_INT >= 8) ? MotionEvent.ACTION_POINTER_INDEX_MASK : 
 				MotionEvent.ACTION_POINTER_INDEX_MASK);
-			Log.v(TAG, "active pointer id : " + mActivePointerId);
 			mLastMotionX = mInitialMotionX = MotionEventCompat.getX(ev, mActivePointerId);
 			mLastMotionY = MotionEventCompat.getY(ev, mActivePointerId);
 			if (thisTouchAllowed(ev)) {
@@ -854,6 +872,10 @@ public class CustomViewAbove extends ViewGroup {
 		case MotionEvent.ACTION_MOVE:
 			if (!mIsBeingDragged) {
 				final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+				if (pointerIndex == -1) {
+					mActivePointerId = INVALID_POINTER;
+					break;
+				}
 				final float x = MotionEventCompat.getX(ev, pointerIndex);
 				final float xDiff = Math.abs(x - mLastMotionX);
 				final float y = MotionEventCompat.getY(ev, pointerIndex);
@@ -870,6 +892,10 @@ public class CustomViewAbove extends ViewGroup {
 				// Scroll to follow the motion event
 				final int activePointerIndex = MotionEventCompat.findPointerIndex(
 						ev, mActivePointerId);
+				if (activePointerIndex == -1) {
+					mActivePointerId = INVALID_POINTER;
+					break;
+				}
 				final float x = MotionEventCompat.getX(ev, activePointerIndex);
 				final float deltaX = mLastMotionX - x;
 				mLastMotionX = x;

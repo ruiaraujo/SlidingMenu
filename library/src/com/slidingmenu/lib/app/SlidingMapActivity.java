@@ -35,6 +35,12 @@ public abstract class SlidingMapActivity extends SherlockMapActivity {
 	}
 
 	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		mHelper.onSaveInstanceState(outState);
+	}
+
+	@Override
 	public void setContentView(int id) {
 		setContentView(getLayoutInflater().inflate(id, null));
 	}
