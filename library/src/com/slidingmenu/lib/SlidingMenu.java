@@ -272,6 +272,7 @@ public class SlidingMenu extends RelativeLayout {
 		int left = params.leftMargin;
 		params.setMargins(left, top, i, bottom);
 		OnGlobalLayoutListener layoutListener = new OnGlobalLayoutListener() {
+			@SuppressWarnings("deprecation")
 			public void onGlobalLayout() {
 				showAbove();
 				mViewAbove.getViewTreeObserver().removeGlobalOnLayoutListener(this);

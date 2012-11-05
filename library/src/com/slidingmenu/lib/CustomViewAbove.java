@@ -38,7 +38,6 @@ import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 public class CustomViewAbove extends ViewGroup {
 
 	private static final String TAG = "CustomViewAbove";
-	private static final boolean DEBUG = false;
 
 	private static final boolean USE_CACHE = false;
 
@@ -608,7 +607,7 @@ public class CustomViewAbove extends ViewGroup {
 	public void computeScroll() {
 		if (!mScroller.isFinished()) {
 			if (mScroller.computeScrollOffset()) {
-				if (DEBUG) Log.i(TAG, "computeScroll: still scrolling");
+				if (BuildConfig.DEBUG) Log.i(TAG, "computeScroll: still scrolling");
 				int oldX = getScrollX();
 				int oldY = getScrollY();
 				int x = mScroller.getCurrX();
@@ -739,7 +738,7 @@ public class CustomViewAbove extends ViewGroup {
 		} else if (mCustomViewBehind != null) {
 			allowed = dx > 0;
 		}
-		if (DEBUG)
+		if (BuildConfig.DEBUG)
 			Log.v(TAG, "this slide allowed " + allowed);
 		return allowed;
 	}
@@ -755,7 +754,7 @@ public class CustomViewAbove extends ViewGroup {
 
 		final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
 
-		if (action == MotionEvent.ACTION_DOWN && DEBUG)
+		if (action == MotionEvent.ACTION_DOWN && BuildConfig.DEBUG)
 			Log.v(TAG, "Received ACTION_DOWN");
 
 		if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
@@ -793,7 +792,7 @@ public class CustomViewAbove extends ViewGroup {
 			final float y = MotionEventCompat.getY(ev, pointerIndex);
 			final float yDiff = Math.abs(y - mLastMotionY);
 			if (xDiff > mTouchSlop && xDiff > yDiff && thisSlideAllowed(dx)) {
-				if (DEBUG) Log.v(TAG, "Starting drag! from onInterceptTouch");
+				if (BuildConfig.DEBUG) Log.v(TAG, "Starting drag! from onInterceptTouch");
 				mIsBeingDragged = true;
 				mLastMotionX = x;
 				setScrollingCacheEnabled(true);
@@ -880,9 +879,9 @@ public class CustomViewAbove extends ViewGroup {
 				final float xDiff = Math.abs(x - mLastMotionX);
 				final float y = MotionEventCompat.getY(ev, pointerIndex);
 				final float yDiff = Math.abs(y - mLastMotionY);
-				if (DEBUG) Log.v(TAG, "Moved x to " + x + "," + y + " diff=" + xDiff + "," + yDiff);
+				if (BuildConfig.DEBUG) Log.v(TAG, "Moved x to " + x + "," + y + " diff=" + xDiff + "," + yDiff);
 				if (xDiff > mTouchSlop && xDiff > yDiff) {
-					if (DEBUG) Log.v(TAG, "Starting drag! from onTouch");
+					if (BuildConfig.DEBUG) Log.v(TAG, "Starting drag! from onTouch");
 					mIsBeingDragged = true;
 					mLastMotionX = x;
 					setScrollingCacheEnabled(true);
@@ -1116,7 +1115,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	private void onSecondaryPointerUp(MotionEvent ev) {
-		if (DEBUG) Log.v(TAG, "onSecondaryPointerUp called");
+		if (BuildConfig.DEBUG) Log.v(TAG, "onSecondaryPointerUp called");
 		final int pointerIndex = MotionEventCompat.getActionIndex(ev);
 		final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
 		if (pointerId == mActivePointerId) {
