@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
-import android.widget.FrameLayout;
 import android.widget.Scroller;
 
 import com.slidingmenu.lib.SlidingMenu.OnClosedListener;
@@ -36,7 +35,6 @@ import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 public class CustomViewAbove extends ViewGroup {
 
 	private static final String TAG = "CustomViewAbove";
-	private static final boolean DEBUG = false;
 
 	private static final boolean USE_CACHE = false;
 
@@ -91,7 +89,6 @@ public class CustomViewAbove extends ViewGroup {
 	protected int mMaximumVelocity;
 	private int mFlingDistance;
 	private int mMarginThreshold;
-	
 	private CustomViewBehind mCustomViewBehind;
 	private int mMode;
 	private boolean mEnabled = true;
@@ -171,8 +168,8 @@ public class CustomViewAbove extends ViewGroup {
 		setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
 		setFocusable(true);
 		final Context context = getContext();
-		mScroller = new Scroller(context, sInterpolator);
 		final ViewConfiguration configuration = ViewConfiguration.get(context);
+		mScroller = new Scroller(context, sInterpolator);
 		mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
 		mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
 		mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
@@ -565,7 +562,7 @@ public class CustomViewAbove extends ViewGroup {
 	public void computeScroll() {
 		if (!mScroller.isFinished()) {
 			if (mScroller.computeScrollOffset()) {
-				if (DEBUG) Log.i(TAG, "computeScroll: still scrolling");
+				if (BuildConfig.DEBUG) Log.i(TAG, "computeScroll: still scrolling");
 				int oldX = getScrollX();
 				int oldY = getScrollY();
 				int x = mScroller.getCurrX();
@@ -692,7 +689,7 @@ public class CustomViewAbove extends ViewGroup {
 				allowed = dx < 0;
 			}
 		}
-		if (DEBUG)
+		if (BuildConfig.DEBUG)
 			Log.v(TAG, "this slide allowed " + allowed);
 		return allowed;
 	}
@@ -712,7 +709,7 @@ public class CustomViewAbove extends ViewGroup {
 
 		final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
 
-		if (action == MotionEvent.ACTION_DOWN && DEBUG)
+		if (action == MotionEvent.ACTION_DOWN && BuildConfig.DEBUG)
 			Log.v(TAG, "Received ACTION_DOWN");
 
 		if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP
@@ -736,7 +733,7 @@ public class CustomViewAbove extends ViewGroup {
 			final float y = MotionEventCompat.getY(ev, pointerIndex);
 			final float yDiff = Math.abs(y - mLastMotionY);
 			if (!mIsUnableToDrag && xDiff > mTouchSlop && xDiff > yDiff && thisSlideAllowed(dx)) {
-				if (DEBUG) Log.v(TAG, "Starting drag! from onInterceptTouch");
+				if (BuildConfig.DEBUG) Log.v(TAG, "Starting drag! from onInterceptTouch");
 				mIsBeingDragged = true;
 				mLastMotionX = x;
 				setScrollingCacheEnabled(true);
@@ -814,9 +811,9 @@ public class CustomViewAbove extends ViewGroup {
 				final float xDiff = Math.abs(x - mLastMotionX);
 				final float y = MotionEventCompat.getY(ev, pointerIndex);
 				final float yDiff = Math.abs(y - mLastMotionY);
-				if (DEBUG) Log.v(TAG, "Moved x to " + x + "," + y + " diff=" + xDiff + "," + yDiff);
+				if (BuildConfig.DEBUG) Log.v(TAG, "Moved x to " + x + "," + y + " diff=" + xDiff + "," + yDiff);
 				if (xDiff > mTouchSlop && xDiff > yDiff) {
-					if (DEBUG) Log.v(TAG, "Starting drag! from onTouch");
+					if (BuildConfig.DEBUG) Log.v(TAG, "Starting drag! from onTouch");
 					mIsBeingDragged = true;
 					mLastMotionX = x;
 					setScrollingCacheEnabled(true);
@@ -1054,7 +1051,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	private void onSecondaryPointerUp(MotionEvent ev) {
-		if (DEBUG) Log.v(TAG, "onSecondaryPointerUp called");
+		if (BuildConfig.DEBUG) Log.v(TAG, "onSecondaryPointerUp called");
 		final int pointerIndex = MotionEventCompat.getActionIndex(ev);
 		final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
 		if (pointerId == mActivePointerId) {
