@@ -40,7 +40,7 @@ public class CustomViewAbove extends ViewGroup {
 
 	private static final int MAX_SETTLE_DURATION = 600; // ms
 	private static final int MIN_DISTANCE_FOR_FLING = 25; // dips
-	private static final int MARGIN_THRESHOLD = 20; // dips
+	private static final int MARGIN_THRESHOLD = 0; // dips
 
 	private static final Interpolator sInterpolator = new Interpolator() {
 		public float getInterpolation(float t) {
