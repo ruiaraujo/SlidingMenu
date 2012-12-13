@@ -28,19 +28,32 @@ public class PropertiesActivity extends BaseActivity {
 		setContentView(R.layout.properties);
 		
 		// left and right modes
-		Button left = (Button) findViewById(R.id.left);
-		Button right = (Button) findViewById(R.id.right);
-		left.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) { 
-				getSlidingMenu().setMode(SlidingMenu.LEFT);
-				getSlidingMenu().setShadowDrawable(R.drawable.shadow);
-			}
-		});
-		right.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) { 
-				getSlidingMenu().setMode(SlidingMenu.RIGHT);
-				getSlidingMenu().setShadowDrawable(R.drawable.shadowright);
-			}
+		RadioGroup mode = (RadioGroup) findViewById(R.id.mode);
+		mode.check(R.id.left);
+		mode.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				SlidingMenu sm = getSlidingMenu();
+				switch (checkedId) {
+				case R.id.left:
+					sm.setMode(SlidingMenu.LEFT);
+					sm.setShadowDrawable(R.drawable.shadow);
+					break;
+				case R.id.right:
+					sm.setMode(SlidingMenu.RIGHT);
+					sm.setShadowDrawable(R.drawable.shadowright);
+					break;
+				case R.id.left_right:
+					sm.setMode(SlidingMenu.LEFT_RIGHT);
+					sm.setSecondaryMenu(R.layout.menu_frame_two);
+					getSupportFragmentManager()
+					.beginTransaction()
+					.replace(R.id.menu_frame_two, new SampleListFragment())
+					.commit();					
+					sm.setSecondaryShadowDrawable(R.drawable.shadowright);
+					sm.setShadowDrawable(R.drawable.shadow);
+				}
+			}			
 		});
 
 		// touch mode stuff
